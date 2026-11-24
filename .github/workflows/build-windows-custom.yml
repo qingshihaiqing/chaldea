@@ -1,0 +1,101 @@
+name: Build Custom Windows
+
+on:
+  push:
+    branches:
+      - main
+      - "feat/*"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Verify & Build Windows Release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout chaldea code
+        uses: actions/checkout@v6
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version-file: "pubspec.yaml"
+          cache: true
+
+      - name: Configure git & Flutter
+        run: |
+          git config --global core.longpaths true
+          flutter config --no-cli-animations
+          flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate l10n & JSON serialization
+        run: |
+          dart run intl_utils:generate
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Dart Analyze
+        run: dart analyze
+
+      - name: Checkout chaldea data for tests
+        uses: actions/checkout@v6
+        with:
+          repository: chaldea-center/chaldea-data
+          path: data/
+
+      - name: Prepare game data for tests
+        run: Move-Item data/dist data/game
+
+      - name: Run servant preset tests
+        run: flutter test test/app/battle/models/svt_preset_test.dart --dart-define="APP_PATH=${{ github.workspace }}/data"
+
+      - name: Cleanup test data
+        run: Remove-Item -Recurse -Force data
+
+      - name: Generate git info & patch before build
+        run: |
+          dart ./scripts/gen_git_info.dart
+          dart ./scripts/patch_before_build.dart windows ${{ github.ref }}
+          flutter pub get
+
+      - name: Build Windows release
+        run: flutter build windows -v --release
+
+      - name: Copy VC redistributables & docs
+        working-directory: build\windows\x64\runner\Release
+        run: |
+          Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\msvcp140.dll') .
+          Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140.dll') .
+          Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140_1.dll') .
+          Copy-Item "${env:GITHUB_WORKSPACE}\windows\README.md" .\README.txt
+          Copy-Item "${env:GITHUB_WORKSPACE}\res\release_docs\安装与升级说明-InstallAndUpgrade.txt" .
+          Compress-Archive -Path * -DestinationPath "${env:GITHUB_WORKSPACE}\chaldea-custom-windows.zip" -Force
+
+      - name: Upload Windows build artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: chaldea-custom-windows
+          if-no-files-found: error
+          path: ./chaldea-custom-windows.zip
+
+      - name: Publish to GitHub Release (prerelease)
+        continue-on-error: true
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: custom-windows
+          name: Chaldea Custom Windows (Servant Presets + Max Out)
+          prerelease: true
+          make_latest: "false"
+          files: chaldea-custom-windows.zip
+          body: |
+            Built from commit `${{ github.sha }}` on `${{ github.ref_name }}`.
+            Includes Servant Presets (cross-servant templates + servant-specific presets) and One-Click Max Out.

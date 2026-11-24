@@ -63,16 +63,19 @@ class BattleSimUserData {
   // questId, teamIds
   Map<int, Set<int>> favoriteTeams;
   List<BattleShareData> teams;
+  List<SvtPreset> svtPresets;
 
   BattleSimUserData({
     Set<int>? pingedCEs,
     Set<int>? pingedSvts,
     Map<int, Set<int>>? favoriteTeams,
     List<BattleShareData>? teams,
+    List<SvtPreset>? svtPresets,
   }) : pingedCEs = pingedCEs ?? {},
        pingedSvts = pingedSvts ?? {},
        favoriteTeams = favoriteTeams ?? {},
-       teams = teams ?? [] {
+       teams = teams ?? [],
+       svtPresets = svtPresets ?? [] {
     validate();
   }
 
@@ -541,6 +544,11 @@ class SvtSaveData {
 
   Map<String, dynamic> toJson() {
     if ((svtId == null || svtId == 0) && !supportType.isSupport && equip1.id == null) return {};
+    return toPresetJson();
+  }
+
+  /// Serializes all fields without dropping empty-servant template snapshots.
+  Map<String, dynamic> toPresetJson() {
     this
       ..ceId = equip1.id
       ..ceLimitBreak = equip1.limitBreak
@@ -566,6 +574,25 @@ class SvtSaveData {
     );
     return data;
   }
+}
+
+Map<String, dynamic> _svtPresetDataToJson(SvtSaveData data) => data.toPresetJson();
+
+@JsonSerializable(includeIfNull: false)
+class SvtPreset {
+  String name;
+  bool isTemplate;
+  @JsonKey(toJson: _svtPresetDataToJson)
+  SvtSaveData data;
+  int bondLv;
+
+  SvtPreset({required this.name, this.isTemplate = false, required this.data, this.bondLv = 5});
+
+  factory SvtPreset.fromJson(Map<String, dynamic> json) => _$SvtPresetFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SvtPresetToJson(this);
+
+  SvtPreset copy() => SvtPreset.fromJson(toJson());
 }
 
 @JsonSerializable()

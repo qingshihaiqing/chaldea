@@ -335,35 +335,260 @@ class PlayerSvtData {
   }
 
   PlayerSvtData copy() {
-    return PlayerSvtData.base()
-      ..svt = svt
-      ..transformSvt = transformSvt
-      ..transformVal = transformVal
-      ..limitCount = limitCount
-      ..skillLvs = skillLvs.toList()
-      ..skills = skills.toList()
-      ..appendLvs = appendLvs.toList()
-      ..extraPassives = extraPassives.toList()
-      ..disabledExtraSkills = disabledExtraSkills.toSet()
-      ..allowedExtraSkills = allowedExtraSkills.toSet()
-      ..customPassives = List<BaseSkill>.of(customPassives)
-      ..customPassiveLvs = customPassiveLvs.toList()
-      ..tdLv = tdLv
-      ..td = td
-      ..lv = lv
-      ..bondLv = bondLv
-      ..atkFou = atkFou
-      ..hpFou = hpFou
-      ..fixedAtk = fixedAtk
-      ..fixedHp = fixedHp
-      ..equip1 = equip1.copy()
-      ..equip2 = equip2.copy()
-      ..equip3 = equip3.copy()
-      ..supportType = supportType
-      ..cardStrengthens = cardStrengthens.toList()
-      ..commandCodes = commandCodes.toList()
-      ..grandSvt = grandSvt
-      ..classBoardData = classBoardData.copy();
+    return PlayerSvtData.base()..copyFrom(this);
+  }
+
+  void copyFrom(PlayerSvtData other) {
+    svt = other.svt;
+    transformSvt = other.transformSvt;
+    transformVal = other.transformVal;
+    limitCount = other.limitCount;
+    skillLvs = other.skillLvs.toList();
+    skills = other.skills.toList();
+    appendLvs = other.appendLvs.toList();
+    extraPassives = other.extraPassives.toList();
+    disabledExtraSkills = other.disabledExtraSkills.toSet();
+    allowedExtraSkills = other.allowedExtraSkills.toSet();
+    customPassives = List<BaseSkill>.of(other.customPassives);
+    customPassiveLvs = other.customPassiveLvs.toList();
+    tdLv = other.tdLv;
+    td = other.td;
+    lv = other.lv;
+    bondLv = other.bondLv;
+    atkFou = other.atkFou;
+    hpFou = other.hpFou;
+    fixedAtk = other.fixedAtk;
+    fixedHp = other.fixedHp;
+    equip1 = other.equip1.copy();
+    equip2 = other.equip2.copy();
+    equip3 = other.equip3.copy();
+    supportType = other.supportType;
+    cardStrengthens = other.cardStrengthens.toList();
+    commandCodes = other.commandCodes.toList();
+    grandSvt = other.grandSvt;
+    classBoardData = other.classBoardData.copy();
+  }
+
+  static int _maxOrdinaryLimitCount(Servant svt) {
+    final limits = {0, ...?svt.extraAssets.faces.ascension?.keys}.where((e) => e <= 4);
+    if (limits.isEmpty) return 4;
+    return limits.reduce(max);
+  }
+
+  static void _fillMaxGrandClassStats(ClassBoard grandBoard, ClassBoardStatisticsData boardData, int classId) {
+    final valsList = <DataVals>[
+      for (final square in grandBoard.squares)
+        for (final func in square.targetSkill?.functions ?? square.targetCommandSpell?.functions ?? <NiceFunction>[])
+          if (func.svals.isNotEmpty) func.svals.first,
+    ];
+    final statTypes = valsList.map((e) => e.CondParamRangeType ?? e.CondParamAddType ?? 0).toSet()..remove(0);
+    boardData.classStatistics.clear();
+    for (final type in statTypes) {
+      final maxCounts = <num>{};
+      for (final vals in valsList) {
+        if (vals.CondParamRangeType == type) {
+          maxCounts.add(vals.CondParamRangeMaxCount ?? 0);
+        } else if (vals.CondParamAddType == type) {
+          if (vals.CondParamAddMaxValue != null && vals.CondParamAddValue != null && vals.CondParamAddValue! > 0) {
+            maxCounts.add(vals.CondParamAddMaxValue! / vals.CondParamAddValue!);
+          }
+        }
+      }
+      maxCounts.remove(0);
+      maxCounts.remove(0.0);
+      if (maxCounts.isNotEmpty) {
+        boardData.getClassStatistic(type, classId).typeVal = maxCounts.reduce(max).toInt();
+      }
+    }
+  }
+
+  /// Maximizes all tunable parameters for the currently selected servant.
+  void maxOut({Region? region, int? jpTime}) {
+    final baseSvt = svt;
+    if (baseSvt == null) return;
+    final targetDisp = dispSvt ?? baseSvt;
+    final maxOrdinaryLimit = _maxOrdinaryLimitCount(targetDisp);
+    if (limitCount < maxOrdinaryLimit) {
+      limitCount = maxOrdinaryLimit;
+    }
+    lv = min(120, max(1, baseSvt.atkGrowth.length));
+    bondLv = kBondLvMax;
+    tdLv = 5;
+    atkFou = 3000;
+    hpFou = 3000;
+    fixedAtk = null;
+    fixedHp = null;
+    skillLvs = List.filled(kActiveSkillNums.length, 10);
+    appendLvs = List.filled(kAppendSkillNums.length, 10);
+    cardStrengthens = List.filled(5, 500);
+
+    updateRankUps(region: region, jpTime: jpTime);
+
+    final baseBoard = ClassBoard.getClassBoard(targetDisp.classId);
+    if (baseBoard != null) {
+      classBoardData.classBoardSquares = ClassBoardPlan.full(baseBoard).enhancedSquares.toList();
+    }
+    if (grandSvt) {
+      final grandBoard = ClassBoard.getGrandClassBoard(targetDisp.classId);
+      if (grandBoard != null) {
+        classBoardData.grandClassBoardSquares = ClassBoardPlan.full(grandBoard).enhancedSquares.toList();
+        _fillMaxGrandClassStats(grandBoard, classBoardData, targetDisp.classId);
+      }
+    }
+
+    for (final equip in [equip1, equip2, equip3]) {
+      final ce = equip.ce;
+      if (ce != null) {
+        equip
+          ..limitBreak = true
+          ..lv = ce.lvMax;
+      }
+    }
+  }
+
+  SvtPreset? toPreset({required String name, bool isTemplate = false}) {
+    if (svt == null) return null;
+    final saved =
+        toStoredData() ??
+        SvtSaveData(
+          svtId: svt?.id,
+          limitCount: limitCount,
+          transformVal: transformVal ? 1 : 0,
+          skillLvs: skillLvs.toList(),
+          skillIds: skills.map((skill) => skill?.id).toList(),
+          appendLvs: appendLvs.toList(),
+          disabledExtraSkills: disabledExtraSkills.toSet(),
+          allowedExtraSkills: allowedExtraSkills.toSet(),
+          customPassives: customPassives.toList(),
+          customPassiveLvs: customPassiveLvs.toList(),
+          tdLv: tdLv,
+          tdId: td?.id,
+          lv: lv,
+          atkFou: atkFou,
+          hpFou: hpFou,
+          fixedAtk: fixedAtk,
+          fixedHp: fixedHp,
+          grandSvt: grandSvt,
+          equip1: equip1.toStoredData(),
+          equip2: grandSvt ? equip2.toStoredDataNull() : null,
+          equip3: grandSvt ? equip3.toStoredDataNull() : null,
+          supportType: SupportSvtType.none,
+          cardStrengthens: cardStrengthens.toList(),
+          commandCodeIds: commandCodes.map((commandCode) => commandCode?.id).toList(),
+          classBoardData: classBoardData.copy(),
+        );
+    return SvtPreset(name: name, isTemplate: isTemplate, data: saved, bondLv: bondLv.clamp(0, kBondLvMax));
+  }
+
+  /// Applies a saved [preset] to this [PlayerSvtData] in-place.
+  ///
+  /// When [includeServant] is `true` (or when the preset targets the same servant),
+  /// servant-specific fields such as skill/NP rank-ups and ascension/costume are
+  /// restored in full. Otherwise, parameters are applied as a cross-servant
+  /// template while keeping the current servant identity intact.
+  Future<void> applyPreset(SvtPreset preset, {required bool includeServant, Region? region, int? jpTime}) async {
+    final stored = preset.data;
+    final sameServant = svt != null && stored.svtId != null && stored.svtId == svt!.id;
+    final prevSupport = supportType == SupportSvtType.npc ? SupportSvtType.none : supportType;
+
+    if (includeServant || sameServant || svt == null) {
+      if (stored.svtId == null || stored.svtId == 0) return;
+      final restored = await fromStoredData(stored);
+      if (restored.svt == null) return;
+      restored.bondLv = preset.bondLv.clamp(0, kBondLvMax);
+      restored.supportType = prevSupport;
+      copyFrom(restored);
+      return;
+    }
+
+    // Cross-servant template mode: preserve current servant identity & transform state.
+    final targetBase = svt!;
+    final targetDisp = dispSvt ?? targetBase;
+    final maxOrdinaryLimit = _maxOrdinaryLimitCount(targetDisp);
+    final nextLimit = stored.limitCount <= 4 ? stored.limitCount.clamp(0, maxOrdinaryLimit) : maxOrdinaryLimit;
+    final limitChanged = nextLimit != limitCount;
+
+    limitCount = nextLimit;
+    lv = stored.lv.clamp(1, min(120, max(1, targetBase.atkGrowth.length)));
+    bondLv = preset.bondLv.clamp(0, kBondLvMax);
+    tdLv = stored.tdLv.clamp(1, 5);
+    atkFou = stored.atkFou.clamp(0, 3000);
+    hpFou = stored.hpFou.clamp(0, 3000);
+    fixedAtk = null;
+    fixedHp = null;
+    skillLvs = List.generate(kActiveSkillNums.length, (i) => (stored.skillLvs.getOrNull(i) ?? 10).clamp(1, 10));
+    appendLvs = List.generate(kAppendSkillNums.length, (i) => (stored.appendLvs.getOrNull(i) ?? 0).clamp(0, 10));
+    cardStrengthens = List.generate(5, (i) => (stored.cardStrengthens.getOrNull(i) ?? 0).clamp(0, 500));
+    commandCodes = List.generate(5, (i) => db.gameData.commandCodesById[stored.commandCodeIds.getOrNull(i)]);
+
+    equip1 = await SvtEquipData.fromStoredData(stored.equip1);
+    grandSvt = stored.grandSvt;
+    if (grandSvt) {
+      if (stored.equip2?.id != null) {
+        final bondCeId = targetBase.bondEquips.firstOrNull;
+        final bondCe = bondCeId == null ? null : db.gameData.craftEssencesById[bondCeId];
+        equip2 = bondCe == null
+            ? SvtEquipData()
+            : SvtEquipData(
+                ce: bondCe,
+                limitBreak: stored.equip2!.limitBreak,
+                lv: stored.equip2!.lv.clamp(1, bondCe.lvMax),
+              );
+      } else {
+        equip2 = SvtEquipData();
+      }
+      equip3 = await SvtEquipData.fromStoredData(stored.equip3);
+    } else {
+      equip2 = SvtEquipData();
+      equip3 = SvtEquipData();
+    }
+
+    // Class board & grand board cross-class adaptation.
+    final storedBoard = stored.classBoardData;
+    final srcSvt = stored.svtId == null ? null : db.gameData.servantsById[stored.svtId];
+    if (storedBoard == null) {
+      classBoardData = ClassBoardStatisticsData();
+    } else if (srcSvt != null && srcSvt.classId == targetDisp.classId) {
+      classBoardData = storedBoard.copy();
+    } else {
+      final mapped = ClassBoardStatisticsData(grandBondEquipSkillChange: storedBoard.grandBondEquipSkillChange);
+      if (storedBoard.classBoardSquares.isNotEmpty) {
+        final targetBaseBoard = ClassBoard.getClassBoard(targetDisp.classId);
+        if (targetBaseBoard != null) {
+          mapped.classBoardSquares = ClassBoardPlan.full(targetBaseBoard).enhancedSquares.toList();
+        }
+      }
+      if (grandSvt) {
+        final targetGrandBoard = ClassBoard.getGrandClassBoard(targetDisp.classId);
+        if (targetGrandBoard != null) {
+          if (storedBoard.grandClassBoardSquares.isNotEmpty) {
+            mapped.grandClassBoardSquares = ClassBoardPlan.full(targetGrandBoard).enhancedSquares.toList();
+          }
+          if (storedBoard.classStatistics.any((e) => e.typeVal > 0)) {
+            _fillMaxGrandClassStats(targetGrandBoard, mapped, targetDisp.classId);
+          }
+        }
+      }
+      classBoardData = mapped;
+    }
+
+    // Custom passive skills are servant-agnostic.
+    customPassives.clear();
+    customPassiveLvs.clear();
+    for (int index = 0; index < stored.customPassives.length; index++) {
+      final storedSkill = stored.customPassives[index];
+      final targetSkill =
+          db.gameData.baseSkills[storedSkill.id] ??
+          (storedSkill.id == 0 ? null : await showEasyLoading(() => AtlasApi.skill(storedSkill.id), mask: true)) ??
+          storedSkill;
+      final lvVal = (stored.customPassiveLvs.getOrNull(index) ?? targetSkill.maxLv).clamp(1, targetSkill.maxLv);
+      customPassives.add(targetSkill);
+      customPassiveLvs.add(lvVal);
+    }
+
+    if (limitChanged || td == null || skills.every((e) => e == null)) {
+      updateRankUps(region: region, jpTime: jpTime);
+    }
   }
 
   static Future<PlayerSvtData> fromStoredData(SvtSaveData? storedData) async {

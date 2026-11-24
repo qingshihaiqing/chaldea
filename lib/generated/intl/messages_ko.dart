@@ -77,6 +77,22 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "svt_option_max_out": MessageLookupByLibrary.simpleMessage("일괄 최대 강화"),
+    "svt_option_max_out_done": MessageLookupByLibrary.simpleMessage("서번트 파라미터를 최대로 설정했습니다"),
+    "svt_preset": MessageLookupByLibrary.simpleMessage("서번트 프리셋"),
+    "svt_preset_applied": MessageLookupByLibrary.simpleMessage("프리셋이 적용되었습니다"),
+    "svt_preset_apply_full": MessageLookupByLibrary.simpleMessage("서번트 포함 적용"),
+    "svt_preset_apply_params": MessageLookupByLibrary.simpleMessage("파라미터 적용"),
+    "svt_preset_empty": MessageLookupByLibrary.simpleMessage("저장된 프리셋이 없습니다"),
+    "svt_preset_filter_current": MessageLookupByLibrary.simpleMessage("현재 서번트"),
+    "svt_preset_manage": MessageLookupByLibrary.simpleMessage("프리셋 및 템플릿"),
+    "svt_preset_name_hint": MessageLookupByLibrary.simpleMessage("프리셋 이름"),
+    "svt_preset_save": MessageLookupByLibrary.simpleMessage("프리셋으로 저장"),
+    "svt_preset_servant_only": MessageLookupByLibrary.simpleMessage("전용 프리셋"),
+    "svt_preset_servant_only_desc": MessageLookupByLibrary.simpleMessage("현재 서번트에 연결합니다(재림/영의 및 스킬·보구 강화 상태도 복원)"),
+    "svt_preset_template": MessageLookupByLibrary.simpleMessage("공용 템플릿"),
+    "svt_preset_template_desc": MessageLookupByLibrary.simpleMessage("레벨, 포우, 커맨드 코드, 예장, 클래스 스코어, 그랜드 설정을 다른 서번트에도 적용합니다"),
+    "svt_preset_toggle_template": MessageLookupByLibrary.simpleMessage("템플릿/전용 전환"),
     "about_app": MessageLookupByLibrary.simpleMessage("정보"),
     "about_app_declaration_text": MessageLookupByLibrary.simpleMessage(
       "이 어플리케이션에 사용되는 데이터는 게임 Fate/GO 및 게임 사이트에서 가져왔습니다. 게임의 텍스트, 그림, 음성의 저작권은 TYPE MOON/FGO PROJECT에 있습니다.\n\n프로그램의 설계는 WeChat의 프로그램인 \"Material Programe\" 과 IOS 앱인 \"Guda\"를 기반으로 제작되었습니다.",

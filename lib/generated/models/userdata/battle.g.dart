@@ -20,6 +20,10 @@ BattleSimUserData _$BattleSimUserDataFromJson(Map json) => $checkedCreate('Battl
       'teams',
       (v) => (v as List<dynamic>?)?.map((e) => BattleShareData.fromJson(Map<String, dynamic>.from(e as Map))).toList(),
     ),
+    svtPresets: $checkedConvert(
+      'svtPresets',
+      (v) => (v as List<dynamic>?)?.map((e) => SvtPreset.fromJson(Map<String, dynamic>.from(e as Map))).toList(),
+    ),
   );
   return val;
 });
@@ -29,6 +33,7 @@ Map<String, dynamic> _$BattleSimUserDataToJson(BattleSimUserData instance) => <S
   'pingedSvts': instance.pingedSvts.toList(),
   'favoriteTeams': instance.favoriteTeams.map((k, e) => MapEntry(k.toString(), e.toList())),
   'teams': instance.teams.map((e) => e.toJson()).toList(),
+  'svtPresets': instance.svtPresets.map((e) => e.toJson()).toList(),
 };
 
 BattleSimSetting _$BattleSimSettingFromJson(Map json) => $checkedCreate('BattleSimSetting', json, ($checkedConvert) {
@@ -859,4 +864,21 @@ Map<String, dynamic> _$FormationBondSvtBonusToJson(FormationBondSvtBonus instanc
   'addRate': instance.addRate,
   'isBond15': instance.isBond15,
   'isBondReachLimit': instance.isBondReachLimit,
+};
+
+SvtPreset _$SvtPresetFromJson(Map json) => $checkedCreate('SvtPreset', json, ($checkedConvert) {
+  final val = SvtPreset(
+    name: $checkedConvert('name', (v) => v as String),
+    isTemplate: $checkedConvert('isTemplate', (v) => v as bool? ?? false),
+    data: $checkedConvert('data', (v) => SvtSaveData.fromJson(Map<String, dynamic>.from(v as Map))),
+    bondLv: $checkedConvert('bondLv', (v) => (v as num?)?.toInt() ?? 5),
+  );
+  return val;
+});
+
+Map<String, dynamic> _$SvtPresetToJson(SvtPreset instance) => <String, dynamic>{
+  'name': instance.name,
+  'isTemplate': instance.isTemplate,
+  'data': _svtPresetDataToJson(instance.data),
+  'bondLv': instance.bondLv,
 };

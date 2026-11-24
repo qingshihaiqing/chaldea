@@ -63,6 +63,22 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "svt_option_max_out": MessageLookupByLibrary.simpleMessage("一括最大強化"),
+    "svt_option_max_out_done": MessageLookupByLibrary.simpleMessage("サーヴァントのパラメータを最大にしました"),
+    "svt_preset": MessageLookupByLibrary.simpleMessage("サーヴァントプリセット"),
+    "svt_preset_applied": MessageLookupByLibrary.simpleMessage("プリセットを適用しました"),
+    "svt_preset_apply_full": MessageLookupByLibrary.simpleMessage("サーヴァントごと適用"),
+    "svt_preset_apply_params": MessageLookupByLibrary.simpleMessage("パラメータ適用"),
+    "svt_preset_empty": MessageLookupByLibrary.simpleMessage("保存されたプリセットはありません"),
+    "svt_preset_filter_current": MessageLookupByLibrary.simpleMessage("現在のサーヴァント"),
+    "svt_preset_manage": MessageLookupByLibrary.simpleMessage("プリセットとテンプレート"),
+    "svt_preset_name_hint": MessageLookupByLibrary.simpleMessage("プリセット名"),
+    "svt_preset_save": MessageLookupByLibrary.simpleMessage("プリセットとして保存"),
+    "svt_preset_servant_only": MessageLookupByLibrary.simpleMessage("個別プリセット"),
+    "svt_preset_servant_only_desc": MessageLookupByLibrary.simpleMessage("現在のサーヴァントに紐付けます（再臨・霊衣やスキル・宝具強化状態も復元）"),
+    "svt_preset_template": MessageLookupByLibrary.simpleMessage("汎用テンプレート"),
+    "svt_preset_template_desc": MessageLookupByLibrary.simpleMessage("レベル・フォウ・コマンドコード・礼装・クラススコア・グランド設定を他のサーヴァントにも適用できます"),
+    "svt_preset_toggle_template": MessageLookupByLibrary.simpleMessage("テンプレート/個別を切替"),
     "about_app": MessageLookupByLibrary.simpleMessage("ついて"),
     "about_app_declaration_text": MessageLookupByLibrary.simpleMessage(
       "　このアプリケーションで使用されるデータは、ゲームおよび次のサイトからのものです。ゲーム画像およびその他のテキストの著作権はTYPE MOON / FGO PROJECTに帰属します。\n　プログラムの機能と設計はWeChatアプリ「素材规划」とiOSアプリのGudaを参照しています。",

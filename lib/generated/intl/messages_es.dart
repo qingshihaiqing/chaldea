@@ -60,6 +60,22 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "svt_option_max_out": MessageLookupByLibrary.simpleMessage("Maximizar"),
+    "svt_option_max_out_done": MessageLookupByLibrary.simpleMessage("Parámetros del sirviente maximizados"),
+    "svt_preset": MessageLookupByLibrary.simpleMessage("Preajustes de sirviente"),
+    "svt_preset_applied": MessageLookupByLibrary.simpleMessage("Preajuste aplicado"),
+    "svt_preset_apply_full": MessageLookupByLibrary.simpleMessage("Aplicar con sirviente"),
+    "svt_preset_apply_params": MessageLookupByLibrary.simpleMessage("Aplicar parámetros"),
+    "svt_preset_empty": MessageLookupByLibrary.simpleMessage("Aún no hay preajustes guardados"),
+    "svt_preset_filter_current": MessageLookupByLibrary.simpleMessage("Sirviente actual"),
+    "svt_preset_manage": MessageLookupByLibrary.simpleMessage("Preajustes y plantillas"),
+    "svt_preset_name_hint": MessageLookupByLibrary.simpleMessage("Nombre del preajuste"),
+    "svt_preset_save": MessageLookupByLibrary.simpleMessage("Guardar como preajuste"),
+    "svt_preset_servant_only": MessageLookupByLibrary.simpleMessage("Preajuste de sirviente"),
+    "svt_preset_servant_only_desc": MessageLookupByLibrary.simpleMessage("Vinculado al sirviente actual (también restaura ascensión/traje y mejoras de habilidades/NP)"),
+    "svt_preset_template": MessageLookupByLibrary.simpleMessage("Plantilla"),
+    "svt_preset_template_desc": MessageLookupByLibrary.simpleMessage("Aplica niveles, Fous, códigos de comando, CE, tablero de clase y ajustes Grand a cualquier sirviente"),
+    "svt_preset_toggle_template": MessageLookupByLibrary.simpleMessage("Cambiar plantilla/sirviente"),
     "about_app": MessageLookupByLibrary.simpleMessage("Acerca de"),
     "about_app_declaration_text": MessageLookupByLibrary.simpleMessage(
       "Los datos utilizados en esta aplicación provienen del juego Fate/GO y de los siguientes sitios web. Los derechos de autor de los textos, imágenes y voces originales del juego pertenecen a TYPE MOON/FGO PROJECT.\n\nEl diseño del programa se basa en el miniprograma WeChat \"Material Programe\" y la aplicación para iOS \"Guda\".",

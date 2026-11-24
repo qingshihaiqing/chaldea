@@ -6899,6 +6899,86 @@ class S {
     return Intl.message('Resync Options', name: 'svt_option_resync', desc: '', locale: localeName, args: []);
   }
 
+  /// `Max Out`
+  String get svt_option_max_out {
+    return Intl.message('Max Out', name: 'svt_option_max_out', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Maxed out servant parameters`
+  String get svt_option_max_out_done {
+    return Intl.message('Maxed out servant parameters', name: 'svt_option_max_out_done', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Servant Presets`
+  String get svt_preset {
+    return Intl.message('Servant Presets', name: 'svt_preset', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Preset applied`
+  String get svt_preset_applied {
+    return Intl.message('Preset applied', name: 'svt_preset_applied', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Apply w/ Servant`
+  String get svt_preset_apply_full {
+    return Intl.message('Apply w/ Servant', name: 'svt_preset_apply_full', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Apply Params`
+  String get svt_preset_apply_params {
+    return Intl.message('Apply Params', name: 'svt_preset_apply_params', desc: '', locale: localeName, args: []);
+  }
+
+  /// `No presets saved yet`
+  String get svt_preset_empty {
+    return Intl.message('No presets saved yet', name: 'svt_preset_empty', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Current Servant`
+  String get svt_preset_filter_current {
+    return Intl.message('Current Servant', name: 'svt_preset_filter_current', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Presets & Templates`
+  String get svt_preset_manage {
+    return Intl.message('Presets & Templates', name: 'svt_preset_manage', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Preset name`
+  String get svt_preset_name_hint {
+    return Intl.message('Preset name', name: 'svt_preset_name_hint', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Save as Preset`
+  String get svt_preset_save {
+    return Intl.message('Save as Preset', name: 'svt_preset_save', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Servant Preset`
+  String get svt_preset_servant_only {
+    return Intl.message('Servant Preset', name: 'svt_preset_servant_only', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Bind to current servant (also restores ascension/costume and skill/NP rank-ups)`
+  String get svt_preset_servant_only_desc {
+    return Intl.message('Bind to current servant (also restores ascension/costume and skill/NP rank-ups)', name: 'svt_preset_servant_only_desc', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Template`
+  String get svt_preset_template {
+    return Intl.message('Template', name: 'svt_preset_template', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Apply levels, Fous, command codes, CE, class board and Grand settings to any servant`
+  String get svt_preset_template_desc {
+    return Intl.message('Apply levels, Fous, command codes, CE, class board and Grand settings to any servant', name: 'svt_preset_template_desc', desc: '', locale: localeName, args: []);
+  }
+
+  /// `Switch Template/Servant`
+  String get svt_preset_toggle_template {
+    return Intl.message('Switch Template/Servant', name: 'svt_preset_toggle_template', desc: '', locale: localeName, args: []);
+  }
+
   /// `Hidden`
   String get svt_plan_hidden {
     return Intl.message('Hidden', name: 'svt_plan_hidden', desc: '', locale: localeName, args: []);

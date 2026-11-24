@@ -51,6 +51,22 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "svt_option_max_out": MessageLookupByLibrary.simpleMessage("الحد الأقصى"),
+    "svt_option_max_out_done": MessageLookupByLibrary.simpleMessage("تم رفع معاملات الخادم إلى الحد الأقصى"),
+    "svt_preset": MessageLookupByLibrary.simpleMessage("إعدادات الخادم المسبقة"),
+    "svt_preset_applied": MessageLookupByLibrary.simpleMessage("تم تطبيق الإعداد المسبق"),
+    "svt_preset_apply_full": MessageLookupByLibrary.simpleMessage("تطبيق مع الخادم"),
+    "svt_preset_apply_params": MessageLookupByLibrary.simpleMessage("تطبيق المعاملات"),
+    "svt_preset_empty": MessageLookupByLibrary.simpleMessage("لا توجد إعدادات مسبقة محفوظة"),
+    "svt_preset_filter_current": MessageLookupByLibrary.simpleMessage("الخادم الحالي"),
+    "svt_preset_manage": MessageLookupByLibrary.simpleMessage("الإعدادات المسبقة والقوالب"),
+    "svt_preset_name_hint": MessageLookupByLibrary.simpleMessage("اسم الإعداد المسبق"),
+    "svt_preset_save": MessageLookupByLibrary.simpleMessage("حفظ كإعداد مسبق"),
+    "svt_preset_servant_only": MessageLookupByLibrary.simpleMessage("إعداد خاص بالخادم"),
+    "svt_preset_servant_only_desc": MessageLookupByLibrary.simpleMessage("ربط بالخادم الحالي (يستعيد أيضاً الصعود/الزي وتقويات المهارات والنبيلة)"),
+    "svt_preset_template": MessageLookupByLibrary.simpleMessage("قالب عام"),
+    "svt_preset_template_desc": MessageLookupByLibrary.simpleMessage("تطبيق المستويات والفو والرموز والبطاقات ولوحة الفئة وإعدادات غراند على أي خادم"),
+    "svt_preset_toggle_template": MessageLookupByLibrary.simpleMessage("تبديل قالب/خادم"),
     "about_app": MessageLookupByLibrary.simpleMessage("عن التطبيق"),
     "about_app_declaration_text": MessageLookupByLibrary.simpleMessage(
       "البيانات ضمن هذا التطبيق مصدرها لعبة Fate/GO والمواقع الاكترونية التابعة. حقوق نشر النصوص الأصلية، الصور، والصوتيات تنتمي الى TYPE MOON/FGO PROJECT.\n\n تصميم التطبيق مبني على التطبيق المصغر ل وي شات \"material programe\" وتطبيق ال آي او اس \"GUDA\". ",

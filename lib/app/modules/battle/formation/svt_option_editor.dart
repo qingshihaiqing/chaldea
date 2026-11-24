@@ -25,6 +25,7 @@ import 'package:chaldea/utils/utils.dart';
 import 'package:chaldea/widgets/widgets.dart';
 
 import 'select_skill_page.dart';
+import 'svt_preset_page.dart';
 
 class ServantOptionEditPage extends StatefulWidget {
   final PlayerSvtData playerSvtData;
@@ -74,7 +75,24 @@ class _ServantOptionEditPageState extends State<ServantOptionEditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(S.current.battle_edit_servant_option), actions: [popupMenu]),
+      appBar: AppBar(
+        title: Text(S.current.battle_edit_servant_option),
+        actions: [
+          if (enableEdit && playerSvtData.svt != null)
+            IconButton(
+              onPressed: maxOutServant,
+              icon: const Icon(Icons.bolt),
+              tooltip: S.current.svt_option_max_out,
+            ),
+          if (enableEdit)
+            IconButton(
+              onPressed: openPresetManager,
+              icon: const Icon(Icons.bookmarks_outlined),
+              tooltip: S.current.svt_preset_manage,
+            ),
+          popupMenu,
+        ],
+      ),
       body: Column(
         children: [
           Expanded(child: body),
@@ -426,6 +444,13 @@ class _ServantOptionEditPageState extends State<ServantOptionEditPage> {
     return PopupMenuButton<dynamic>(
       enabled: enableEdit,
       itemBuilder: (context) {
+        final curSvtId = playerSvtData.svt?.id;
+        final quickPresets = <SvtPreset>[
+          for (final p in db.curUser.battleSim.svtPresets)
+            if (curSvtId != null && p.data.svtId == curSvtId) p,
+          for (final p in db.curUser.battleSim.svtPresets)
+            if (p.isTemplate && !(curSvtId != null && p.data.svtId == curSvtId)) p,
+        ].take(5).toList();
         return [
           PopupMenuItem(
             enabled: false,
@@ -469,6 +494,36 @@ class _ServantOptionEditPageState extends State<ServantOptionEditPage> {
               },
               child: Text('${S.current.svt_option_resync}(${source.detailName})'),
             ),
+          const PopupMenuDivider(),
+          PopupMenuItem(
+            enabled: playerSvtData.svt != null,
+            onTap: maxOutServant,
+            child: Text(S.current.svt_option_max_out),
+          ),
+          PopupMenuItem(
+            enabled: playerSvtData.svt != null,
+            onTap: saveCurrentAsPreset,
+            child: Text(S.current.svt_preset_save),
+          ),
+          PopupMenuItem(
+            onTap: openPresetManager,
+            child: Text('${S.current.svt_preset_manage} (${db.curUser.battleSim.svtPresets.length})'),
+          ),
+          if (quickPresets.isNotEmpty) ...[
+            const PopupMenuDivider(),
+            for (final preset in quickPresets)
+              PopupMenuItem(
+                enabled: playerSvtData.svt != null || (preset.data.svtId != null && preset.data.svtId != 0),
+                onTap: () {
+                  applySavedPreset(preset, includeServant: playerSvtData.svt == null);
+                },
+                child: Text(
+                  '${preset.isTemplate ? '[${S.current.svt_preset_template}] ' : ''}${preset.name}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+          ],
         ];
       },
     );
@@ -1492,6 +1547,43 @@ class _ServantOptionEditPageState extends State<ServantOptionEditPage> {
 
     if (mounted) setState(() {});
     EasyLoading.showSuccess('${S.current.updated}(${resultSource.detailName})');
+  }
+
+  void maxOutServant() {
+    if (playerSvtData.svt == null || !enableEdit) return;
+    _updateState(() {
+      playerSvtData.maxOut(region: widget.playerRegion, jpTime: questPhase?.jpOpenAt);
+    });
+    EasyLoading.showSuccess(S.current.svt_option_max_out_done);
+  }
+
+  Future<void> saveCurrentAsPreset() async {
+    if (playerSvtData.svt == null || !enableEdit) return;
+    await showSaveSvtPresetDialog(context: context, playerSvtData: playerSvtData);
+    if (mounted) setState(() {});
+  }
+
+  Future<void> openPresetManager() async {
+    if (!enableEdit) return;
+    await router.pushPage(
+      SvtPresetPage(
+        playerSvtData: playerSvtData,
+        onApply: (preset, includeServant) => applySavedPreset(preset, includeServant: includeServant),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
+  Future<void> applySavedPreset(SvtPreset preset, {required bool includeServant}) async {
+    if (!enableEdit) return;
+    await playerSvtData.applyPreset(
+      preset,
+      includeServant: includeServant,
+      region: widget.playerRegion,
+      jpTime: questPhase?.jpOpenAt,
+    );
+    _updateState(() {});
+    EasyLoading.showSuccess('${S.current.svt_preset_applied}: ${preset.name}');
   }
 
   Future<void> _onSelectSupport(SupportServant support) async {
